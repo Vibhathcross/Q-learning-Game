@@ -201,3 +201,91 @@ The simulator provides a built-in benchmark evaluating 6 different hyperparamete
 4. Member 4 (Roll No / ID)
 5. Member 5 (Roll No / ID)
 6. Member 6 (Roll No / ID)
+
+---
+
+## 9. How to Clone and Run on Any Device (GitHub Setup Guide)
+
+Follow these step-by-step terminal instructions to clone the repository, set up a dedicated working folder, install prerequisites, and launch the simulator on another computer (Windows, macOS, or Linux).
+
+### Step 1: Open Terminal or Command Prompt
+- **Windows:** Press `Win + R`, type `powershell` (or `cmd`), and press Enter.
+- **macOS:** Press `Cmd + Space`, type `Terminal`, and press Enter.
+- **Linux:** Press `Ctrl + Alt + T`.
+
+### Step 2: Choose a Directory and Clone the Repository
+Navigate to your desired directory (for example, your Desktop or Projects directory) and clone the repository:
+
+```bash
+# Navigate to Desktop (or your preferred workspace)
+cd Desktop
+
+# Clone the repository into a dedicated folder
+git clone https://github.com/Vibhathcross/Q-learning-Game.git
+
+# Enter the cloned project folder
+cd Q-learning-Game
+```
+
+### Step 3: Set Up a Python Virtual Environment (Recommended)
+Creating an isolated virtual environment prevents library conflicts across projects:
+
+- **On Windows (PowerShell / CMD):**
+  ```bash
+  # Create a virtual environment named 'venv'
+  python -m venv venv
+
+  # Activate the virtual environment
+  .\venv\Scripts\activate
+  ```
+
+- **On macOS / Linux:**
+  ```bash
+  # Create a virtual environment named 'venv'
+  python3 -m venv venv
+
+  # Activate the virtual environment
+  source venv/bin/activate
+  ```
+
+### Step 4: Install Required Dependencies
+Install the required packages using `pip`:
+```bash
+pip install flask flask-cors numpy
+```
+
+### Step 5: Launch the Web Simulator
+Start the Flask application server:
+
+- **Windows:**
+  ```bash
+  python app.py
+  # (or 'py app.py' if using the Python Launcher)
+  ```
+
+- **macOS / Linux:**
+  ```bash
+  python3 app.py
+  ```
+
+Once running, you will see output similar to:
+```text
+=======================================================
+  Q-Learning Grid World Server Starting...
+  Open your browser at: http://127.0.0.1:5000
+=======================================================
+```
+
+Open your browser and visit:
+```text
+http://127.0.0.1:5000
+```
+
+### Step 6: Command-Line Pipeline Verification (Optional)
+To test model convergence directly in your terminal without a web browser:
+```bash
+python main.py
+# (or 'py main.py' on Windows / 'python3 main.py' on macOS & Linux)
+```
+This runs the full 350-episode training loop and prints the learned 8-step optimal trajectory with cumulative rewards.
+
