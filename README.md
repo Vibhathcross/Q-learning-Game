@@ -65,7 +65,78 @@ To balance discovery of new routes with exploitation of known high-value paths:
 
 ---
 
-## 3. Directory Structure
+## 3. Detailed Step-by-Step Working Mechanism
+
+The Q-learning pipeline works through five concrete stages:
+
+```text
++---------------------------------------------------------------------------------+
+|                       1. ENVIRONMENT INITIALIZATION                             |
+|  - Creates 5x5 coordinate matrix                                                |
+|  - Places Agent at (0, 0), Goal at (4, 4), Walls at (1,1), (1,3), (2,3), (3,1)   |
+|  - Initializes Q-Table: 5 x 5 x 4 array of all zeros                            |
++---------------------------------------------------------------------------------+
+                                       │
+                                       ▼
++---------------------------------------------------------------------------------+
+|                         2. EPISODE EXECUTION LOOP                               |
+|  Repeat for each Episode (1 to 350):                                            |
+|    a. Reset agent to start state s = (0, 0)                                     |
+|    b. Sample random number p between 0.0 and 1.0:                               |
+|         - If p < ε: Choose random action a ∈ {UP, DOWN, LEFT, RIGHT}            |
+|         - If p ≥ ε: Choose greedy action a* = argmax Q(s, a)                    |
+|    c. Execute action 'a' in Environment:                                        |
+|         - Compute candidate next coordinate (r + Δr, c + Δc)                    |
+|         - If hitting boundary or wall: s' = s, reward r = -5.0                  |
+|         - If hitting Goal: s' = (4, 4), reward r = +20.0, done = True           |
+|         - Otherwise: s' = (r', c'), reward r = -1.0, done = False               |
++---------------------------------------------------------------------------------+
+                                       │
+                                       ▼
++---------------------------------------------------------------------------------+
+|                      3. BELLMAN CALCULATION & VALUE UPDATE                      |
+|    For transition (s, a, r, s'):                                                |
+|      1. Query Q_old = Q[s, a]                                                   |
+|      2. Query downstream max value: best_next_q = max Q[s', a'] (0.0 if done)   |
+|      3. Compute TD Target  = r + γ * best_next_q                                |
+|      4. Compute TD Error   = TD Target - Q_old                                  |
+|      5. Compute Value Gain = α * TD Error                                       |
+|      6. Update Q-Table     = Q_old + Value Gain                                 |
++---------------------------------------------------------------------------------+
+                                       │
+                                       ▼
++---------------------------------------------------------------------------------+
+|                         4. EPSILON DECAY & CONVERGENCE                          |
+|  - Multiply ε by decay factor (0.992)                                           |
+|  - In early episodes (1-80): ε > 0.50 (wide random exploration)                 |
+|  - In mid episodes (80-200): ε drops to ~0.20 (consolidates goal paths)         |
+|  - In late episodes (200-350): ε ≤ 0.06 (pure exploitation of shortest route)   |
++---------------------------------------------------------------------------------+
+                                       │
+                                       ▼
++---------------------------------------------------------------------------------+
+|                      5. OPTIMAL POLICY EXTRACTION & RUN                         |
+|  - Freeze Q-table (exploration ε = 0)                                           |
+|  - At each state, optimal action is: π*(s) = argmax_a Q(s, a)                   |
+|  - Trace greedy trajectory from (0, 0): Reaches (4, 4) in exactly 8 steps       |
++---------------------------------------------------------------------------------+
+```
+
+### Numerical Trace: How a Single Value Updates (Example from Episode 1)
+Suppose the agent begins at `(0, 0)` with all Q-values equal to `0.0`. It steps `RIGHT` into cell `(0, 1)`:
+1. **Old Value:** `Q_old((0, 0), RIGHT) = 0.00`
+2. **Immediate Reward:** `r = -1.0` (step penalty)
+3. **Future Value:** `max Q((0, 1)) = 0.00`
+4. **TD Target:** `r + γ * max Q = -1.0 + (0.90 * 0.00) = -1.00`
+5. **TD Error (Surprise):** `Target - Q_old = -1.00 - 0.00 = -1.00`
+6. **Value Gain:** `α * Error = 0.10 * (-1.00) = -0.10`
+7. **New Value:** `Q_new((0, 0), RIGHT) = 0.00 + (-0.10) = -0.10`
+
+As episodes progress and the agent finds the goal at `(4, 4)` with `+20.0`, that high reward propagates backward cell-by-cell on every episode update!
+
+---
+
+## 4. Directory Structure
 
 The project has been kept strictly minimal, modular, and professional:
 
@@ -90,7 +161,7 @@ ML_Pro/
 
 ---
 
-## 4. How the System Works
+## 5. System Architecture & Communication Flow
 
 ```text
 +-------------------------------------------------------------------------------+
@@ -124,7 +195,7 @@ ML_Pro/
 
 ---
 
-## 5. Quick Start & Execution Guide
+## 6. Quick Start & Execution Guide
 
 ### Prerequisites
 Make sure Python 3.8+ is installed on your machine. Install standard backend dependencies:
@@ -157,7 +228,7 @@ python main.py
 
 ---
 
-## 6. Step-by-Step Value Flow Across the Learned Path
+## 7. Step-by-Step Value Flow Across the Learned Path
 
 When following the learned greedy policy from start `(0, 0)` to goal `(4, 4)`, the agent executes the minimum theoretical route in **8 steps**:
 
@@ -189,7 +260,7 @@ When following the learned greedy policy from start `(0, 0)` to goal `(4, 4)`, t
 
 ---
 
-## 7. Hyperparameter Analysis & Observations
+## 8. Hyperparameter Analysis & Observations
 
 The simulator provides a built-in benchmark evaluating 6 different hyperparameter configurations over 250 episodes:
 
@@ -209,7 +280,7 @@ The simulator provides a built-in benchmark evaluating 6 different hyperparamete
 
 ---
 
-## 8. Team Members (Max 6 Members)
+## 9. Team Members (Max 6 Members)
 1. Member 1 (Roll No / ID)
 2. Member 2 (Roll No / ID)
 3. Member 3 (Roll No / ID)
@@ -219,7 +290,7 @@ The simulator provides a built-in benchmark evaluating 6 different hyperparamete
 
 ---
 
-## 9. How to Clone and Run on Any Device (GitHub Setup Guide)
+## 10. How to Clone and Run on Any Device (GitHub Setup Guide)
 
 Follow these step-by-step terminal instructions to clone the repository, set up a dedicated working folder, install prerequisites, and launch the simulator on another computer (Windows, macOS, or Linux).
 
