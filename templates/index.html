@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Learning Grid World Simulator | Machine Learning Laboratory</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Chart.js CDN for dynamic live charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Top Header Navigation -->
+    <header class="header-bar">
+      <div>
+        <h1 class="brand-title">
+          Q-Learning Grid World Intelligent Agent
+          <span class="brand-badge">RL Simulator</span>
+        </h1>
+        <p class="header-subtitle">
+          S5 Machine Learning Laboratory &bull; Model-Free Reinforcement Learning with Dynamic Bellman Updates
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-outline" onclick="fetchHyperparameterAnalysis()">
+          &#9881; Run Hyperparameter Experiments
+        </button>
+      </div>
+    </header>
+
+    <!-- Formula Reference Banner -->
+    <div class="formula-strip">
+      <div>
+        <b>Bellman Optimality Equation:</b>
+        <span class="formula-code">Q(s, a) &larr; Q(s, a) + &alpha; &times; [ r + &gamma; max Q(s', a') - Q(s, a) ]</span>
+      </div>
+      <div>
+        <b>Reward Scheme:</b> Goal = <span style="font-weight:700; color:#15803d;">+20.0</span> | Wall / Boundary = <span style="font-weight:700; color:#b91c1c;">-5.0</span> | Step Cost = <span style="font-weight:700; color:#b45309;">-1.0</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="dashboard-grid">
+
+      <!-- Left Column: Grid World Arena -->
+      <div class="card arena-card">
+        <div class="card-title" style="width: 100%;">
+          <span>Grid World Arena (5 &times; 5)</span>
+          <span id="pos-indicator" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Pos: (0, 0)</span>
+        </div>
+
+        <!-- The 5x5 Grid Board -->
+        <div id="grid-board"></div>
+
+        <!-- Manual Navigation D-Pad for Interactive Testing -->
+        <div class="manual-controls">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Manual Step Control</span>
+          <button class="btn-dpad" onclick="manualStep(0)" title="Step UP">&uarr;</button>
+          <div class="dpad-row">
+            <button class="btn-dpad" onclick="manualStep(2)" title="Step LEFT">&larr;</button>
+            <button class="btn-dpad" onclick="manualStep(1)" title="Step DOWN">&darr;</button>
+            <button class="btn-dpad" onclick="manualStep(3)" title="Step RIGHT">&rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Training Controls & Live Telemetry -->
+      <div class="card controls-panel">
+        <div class="card-title">Hyperparameter Configuration & Controls</div>
+
+        <!-- Parameters Input -->
+        <div class="param-grid">
+          <div class="input-group">
+            <label class="input-label" for="input-alpha">Learning Rate (&alpha;)</label>
+            <input type="number" id="input-alpha" class="input-field" step="0.01" min="0.01" max="1.0" value="0.10">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="input-gamma">Discount Factor (&gamma;)</label>
+            <input type="number" id="input-gamma" class="input-field" step="0.05" min="0.1" max="0.99" value="0.90">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="input-episodes">Training Episodes</label>
+            <input type="number" id="input-episodes" class="input-field" step="50" min="50" max="1000" value="350">
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-bar">
+          <button class="btn btn-primary" id="btn-train" onclick="trainAgent()">
+            &#9889; Train Agent
+          </button>
+          <button class="btn btn-success" id="btn-run" onclick="runOptimalPath()">
+            &#9654; Run Optimal Path
+          </button>
+          <button class="btn btn-outline" onclick="stepGreedy()">
+            &#8677; Single Step
+          </button>
+          <button class="btn btn-outline" onclick="toggleArrows()">
+            &#8644; Toggle Arrows / Q-Values
+          </button>
+          <button class="btn btn-outline" onclick="resetAgent()">
+            &#8635; Reset Agent
+          </button>
+        </div>
+
+        <!-- Telemetry Stats Cards -->
+        <div class="telemetry-row">
+          <div class="stat-box">
+            <div class="stat-label">Model Status</div>
+            <div class="stat-val" id="val-status" style="color: var(--warning); font-size: 15px;">Untrained</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Steps (Optimal: 8)</div>
+            <div class="stat-val" id="val-steps">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Reward</div>
+            <div class="stat-val" id="val-reward">0.0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Exploration (&epsilon;)</div>
+            <div class="stat-val" id="val-epsilon">1.000</div>
+          </div>
+        </div>
+
+        <!-- Real-Time Dynamic Calculation Line -->
+        <div class="live-calc-box" id="calc-box">
+          <div class="calc-line-title" id="calc-title">Ready for execution</div>
+          <div class="calc-line-math" id="calc-math">Click "Train Agent" or "Run Optimal Path" to observe real-time Bellman updates.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Step-by-Step Mathematical Calculations Table -->
+    <div class="card table-card">
+      <div class="card-title">
+        <span>Dynamic Step-by-Step Mathematical Calculations Table</span>
+        <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">
+          Each row displays the transition tuple (s, a, r, s') and exact Bellman value gain
+        </span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>State (s)</th>
+            <th>Action Taken</th>
+            <th>Next State (s')</th>
+            <th>Reward (r)</th>
+            <th>Best Future max Q(s')</th>
+            <th>Bellman Target: r + &gamma; &times; max Q(s')</th>
+            <th>Q-Value Q(s, a)</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody id="calc-table-body">
+          <tr>
+            <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 18px;">
+              Train the agent to populate and track the step-by-step mathematical calculations.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Performance Charts Row -->
+    <div class="charts-grid">
+      <div class="card">
+        <div class="card-title">Training Progress: Cumulative Reward per Episode</div>
+        <div class="chart-container">
+          <canvas id="rewardChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Convergence: Steps to Reach Goal per Episode</div>
+        <div class="chart-container">
+          <canvas id="stepsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hyperparameter Sensitivity Experiments Table -->
+    <div class="card table-card" id="hyperparam-card" style="display: none;">
+      <div class="card-title">
+        <span>Hyperparameter Sensitivity Analysis Results</span>
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">
+          Comparison across 6 distinct learning rate (&alpha;) and discount factor (&gamma;) settings
+        </span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Configuration</th>
+            <th>Learning Rate (&alpha;)</th>
+            <th>Discount Factor (&gamma;)</th>
+            <th>Epsilon Decay</th>
+            <th>Final Avg Reward</th>
+            <th>Avg Steps to Goal</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="hyperparam-table-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

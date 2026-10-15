@@ -1,0 +1,490 @@
+:root {
+  --bg-main: #f8fafc;
+  --surface: #ffffff;
+  --surface-alt: #f1f5f9;
+  --border: #e2e8f0;
+  --border-focus: #3b82f6;
+  
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --danger: #dc2626;
+  --warning: #f59e0b;
+  --info: #0284c7;
+  
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --wall-color: #334155;
+  --start-color: #dbeafe;
+  --start-text: #1e40af;
+  --goal-color: #dcfce7;
+  --goal-text: #166534;
+  --trail-color: #fee2e2;
+  --agent-color: #ef4444;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  padding: 24px;
+}
+
+.app-wrapper {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #eff6ff;
+  color: var(--primary);
+  border: 1px solid #bfdbfe;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.header-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Formula Banner */
+.formula-strip {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #166534;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.formula-code {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  background: #dcfce7;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #15803d;
+}
+
+/* Main Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 950px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Container */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Grid World Arena */
+.arena-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#grid-board {
+  display: grid;
+  grid-template-columns: repeat(5, 84px);
+  grid-template-rows: repeat(5, 84px);
+  gap: 7px;
+  background: var(--surface-alt);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.cell {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.cell-coord {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 10px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.cell.start {
+  background: var(--start-color);
+  border-color: #93c5fd;
+  color: var(--start-text);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.cell.goal {
+  background: var(--goal-color);
+  border-color: #86efac;
+  color: var(--goal-text);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.cell.obstacle {
+  background: var(--wall-color);
+  border-color: var(--wall-color);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.cell.path-visited {
+  background: var(--trail-color);
+  border-color: #fca5a5;
+}
+
+.policy-arrow {
+  font-size: 18px;
+  font-weight: 800;
+  color: #475569;
+  line-height: 1;
+}
+
+.policy-q {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--info);
+  margin-top: 2px;
+}
+
+/* Agent Token */
+.agent-token {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: var(--agent-color);
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.45);
+  font-size: 18px;
+  z-index: 10;
+  transition: all 0.25s ease-in-out;
+}
+
+/* Manual Action D-Pad */
+.manual-controls {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dpad-row {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-dpad {
+  width: 46px;
+  height: 38px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-dpad:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+/* Control & Config Form */
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.input-field {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #ffffff;
+  color: var(--text-main);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--border-focus);
+}
+
+.btn-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background: var(--success-hover);
+}
+
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+
+.btn-outline:hover {
+  background: var(--surface-alt);
+  border-color: #cbd5e1;
+}
+
+/* Live Telemetry Metrics */
+.telemetry-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-box {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 2px;
+}
+
+/* Active Calculation Box */
+.live-calc-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calc-line-title {
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.calc-line-math {
+  color: #0369a1;
+}
+
+/* Step Calculations Table */
+.table-card {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+
+th {
+  background: var(--surface-alt);
+  padding: 10px 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1.5px solid var(--border);
+}
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:hover td {
+  background: #f8fafc;
+}
+
+tr.highlight-active td {
+  background: #fef9c3 !important;
+  font-weight: 700;
+}
+
+.math-cell {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  color: #0284c7;
+}
+
+.reward-pos {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.reward-neg {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Charts Section */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container {
+  height: 240px;
+  position: relative;
+}
